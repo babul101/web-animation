@@ -406,7 +406,7 @@ function setupSmoothScroll() {
 document.addEventListener('DOMContentLoaded', () => {
 
     // Preloader
-    preloadFiles(['ring.glb','images/rings.jpg','images/slide1.jpg','images/slide2.jpg','images/slide3.jpg','hands.mp4']);
+    preloadFiles(['ring.glb','images/rings.jpg','images/slide1.jpg','images/slide2.jpg','images/slide3.jpg','ring.mp4']);
 
   initThreeJS()
   initRenderLoop()
