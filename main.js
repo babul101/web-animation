@@ -10,7 +10,10 @@ import Lenis from '@studio-freight/lenis'
 
 gsap.registerPlugin(TextPlugin);
 gsap.registerPlugin(ScrollTrigger);
-
+const loader = new GLTFLoader()
+let ring = null
+let contactRotation = false
+let renderer,scene,camera
 
 function initThreeJS(){
     // Debug
@@ -24,7 +27,34 @@ function initThreeJS(){
   scene = new THREE.Scene()
 
   // Middle stuff
+  loader.load('ring.glb',function(gltf){
+    ring = gltf.scene
+    ring.position.set(0,0,0)
+    ring.scale.set(0.5,0.5,0.5)
+    scene.add(ring)
 
+    const t1 = gsap.timeline({
+        scrollTrigger:{
+            trigger:'section.details',
+            start:'top bottom',
+            end:'bottom top',
+            scrub:true
+        },
+        defaults:{
+            ease:'power3.out',
+            duration:3
+        }
+    })
+
+    t1.to(ring.position,{
+        z:3.5,
+        y:-0.34
+    },'<')
+
+    const directionalLight = new THREE.DirectionalLight('lightblue',10)
+    directionalLight.position.z = 8
+    scene.add(directionalLight)
+  })  
 
   /**
    * Sizes
@@ -72,8 +102,43 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
 }
   
+function initRenderLoop() {
 
+    const clock = new THREE.Clock()
+  
+    const tick = () =>
+    {
+  
+        const elapsedTime = clock.getElapsedTime()
+  
+        // Update objects
+        if (ring) {
+          if (!contactRotation) {
+            ring.rotation.y = .5 * elapsedTime
+            ring.rotation.x = 0
+            ring.rotation.z = 0
+          }
+          else {
+            ring.rotation.y = 0
+            ring.rotation.x = .2 * elapsedTime
+            ring.rotation.z = .2 * elapsedTime
+          }
+        }
+  
+        // Update Orbital Controls
+        // controls.update()
+  
+        // Render
+        renderer.render(scene, camera)
+  
+        // Call tick again on the next frame
+        window.requestAnimationFrame(tick)
+    }
+  
+    tick()
+  }
 
 document.addEventListener('DOMContentLoaded',() => {
     initThreeJS();
+    initRenderLoop();
 })
